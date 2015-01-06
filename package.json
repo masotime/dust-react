@@ -1,0 +1,29 @@
+{
+  "name": "dust-react",
+  "version": "0.0.1",
+  "description": "Dust helper to render react components server-side",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:masotime/dust-react.git"
+  },
+  "keywords": [
+    "dust",
+    "react"
+  ],
+  "author": "Benjamin Goh <masotime@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/masotime/dust-react/issues"
+  },
+  "homepage": "https://github.com/masotime/dust-react",
+  "dependencies": {
+    "bundalo": "^0.2.7",
+    "node-jsx": "^0.12.4",
+    "react": "^0.12.2",
+    "verror": "^1.6.0"
+  }
+}
