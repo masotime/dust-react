@@ -1,9 +1,10 @@
 Dust helper to render React components. Currently tailored to Kraken, although _theoretically_ it should work everywhere.
 
-The helper is a function that takes 2 arguments, `dust` and an `options` object. Valid optiosn are:
+The helper is a function that takes 2 arguments, `dust` and an `options` object. Valid options are:
 
 * `relativePath` - path to react components. The path is relative to `process.cwd()`
-* `enableMetadata` - PayPal specific option which doesn't really work correctly.
+
+NOTE: The helper originally included bundalo that would load content automatically, but I decided against integrating it.
 
 ## Kraken 1.x setup
 
@@ -19,7 +20,7 @@ To make it work, in `config.json` (or `development.json` etc.), add the followin
                         "cache": true, 
                         "helpers": [ { 
                             "name": "dust-react", 
-                            "arguments": { "enableMetadata": false, "relativePath": "public/js/react" } } 
+                            "arguments": { "relativePath": "public/js/react" } } 
                         ]
                     }, .....
                 ]
@@ -33,24 +34,18 @@ Note the key lines under `view engines > js > renderer > arguments[0] > helpers`
 
 e.g.
 
-	{@react component="textfield" componentId="fruitControl" bundle="index"
-		id="fruit"
-		value="Pineapple"
-		label="@field.fruit.label"
-		placeholder="@field.fruit.placeholder"
-		helpers=helpers
-		className="paypal-input"
+	{@react 
+        component="textfield" 
+        componentId="fruitControl"
+        props=reactProps
 	/}
 
 A react component is declared via the parameters `component` and `componentId`. 
 
 * `component` (**required**) must point to an actual `.jsx` file located in `relativePath` as defined under the setup.
 * `componentId` (**required**) is an id that is assigned to a `<div>` that wraps the rendered React component.
-* `bundle` is the name of the bundle to load content.
 
-Apart from the parameters above, all other parameters are passed directly to the React component, with a special provisio for strings that begin with `@`.
-
-The module uses `bundalo` internally to load content for any parameter that is prefixed with `@`. It will search for properties files located at `locales/` and load the appropriate bundle as specified by the `bundle` parameter to the dust helper. The content is then resolved and passed to the component.
+React props are passed in via the "props" attribute. If your props contain i18n content, you will need to make the correct locale-specific strings available as part of the props passed in via the model.
 
 ## NOTES:
 
