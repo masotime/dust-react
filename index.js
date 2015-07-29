@@ -1,7 +1,5 @@
 // THIS IS A SERVER-SIDE ONLY HELPER
 'use strict';
-require('node-jsx').install({extension: '.jsx'}); // allows requiring of .jsx files
-
 var React = require('react'),
 	path = require('path'),
 	VError = require('verror');
@@ -9,21 +7,25 @@ var React = require('react'),
 var componentCache = {}, // memoization
 	atom = '\u269b';
 
+require('babel/register')({
+	extensions: ['.jsx']
+});
+
 function loadComponent(relativePath, componentPath, callback) {
 	var resolvedPath;
 	if (!componentPath.match(/\.jsx$/)) {
 		componentPath += '.jsx';
 	}
 
-	if (componentPath in componentCache) {
+	if (componentCache.hasOwnProperty(componentPath)) {
 		return callback(null, componentCache[componentPath]);
 	}
-	
+
 	try {
 		resolvedPath = path.resolve(process.cwd(), relativePath, componentPath);
 		componentCache[componentPath] = React.createFactory(require(resolvedPath));
 	} catch (e) {
-		return callback(new VError(e, 'Unable to load react component at ' + resolvedPath + ' (resolved from '+componentPath+')'));
+		return callback(new VError(e, 'Unable to load react component at ' + resolvedPath + ' (resolved from ' + componentPath + ')'));
 	}
 
 	return callback(null, componentCache[componentPath]);
@@ -34,7 +36,7 @@ function atomMessage(message) {
 }
 
 function componentWrap(html, containerId) {
-	return '<div id="'+containerId+'">'+html+'</div>';
+	return '<div id="' + containerId + '">' + html + '</div>';
 }
 
 module.exports = function (dust, options) {
@@ -58,16 +60,16 @@ module.exports = function (dust, options) {
 		// parameter checking
 		['component', 'componentId'].forEach(function (requiredParam) {
 			if (!(requiredParam in param)) {
-				paramFailure.push(requiredParam+' missing');
+				paramFailure.push(requiredParam + ' missing');
 			}
 		});
 
 		if (paramFailure.length > 0) {
-			return chunk.write(atomMessage(paramFailure.join(', ')));	
-		}		
+			return chunk.write(atomMessage(paramFailure.join(', ')));
+		}
 
 		// asynchronous dust rendering
-		return chunk.map(function(chunk) {
+		return chunk.map(function (innerChunk) {
 
 			// component loading
 			loadComponent(relativePath, param.component, function(err, reactComponent) {
@@ -75,7 +77,7 @@ module.exports = function (dust, options) {
 
 				if (err) {
 					console.error(err.stack);
-					return chunk.end(atomMessage('Failure loading component '+ param.component+', check logs'));
+					return innerChunk.end(atomMessage('Failure loading component ' + param.component + ', check logs'));
 				} else {
 					componentId = param.componentId;
 
@@ -84,10 +86,10 @@ module.exports = function (dust, options) {
 					} catch(renderError) {
 						console.error(renderError.stack);
 						console.error('Props used', JSON.stringify(reactProps, null, 4));
-						return chunk.end(atomMessage('Error rendering component - check logs'));
+						return innerChunk.end(atomMessage('Error rendering component - check logs'));
 					}
 
-					return chunk.end(renderedString);
+					return innerChunk.end(renderedString);
 
 				}
 			});

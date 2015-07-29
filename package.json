@@ -1,6 +1,6 @@
 {
   "name": "dust-react",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "Dust helper to render react components server-side",
   "main": "index.js",
   "scripts": {
@@ -21,8 +21,15 @@
   },
   "homepage": "https://github.com/masotime/dust-react",
   "dependencies": {
-    "node-jsx": "^0.12.4",
-    "react": "^0.12.2",
+    "babel": "^5.8.12",
+    "react": "^0.13",
     "verror": "^1.6.0"
+  },
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "cheerio": "^0.19.0",
+    "dustjs-linkedin": "^2.7.2",
+    "eslint": "^0.24.1",
+    "mocha": "^2.2.5"
   }
 }

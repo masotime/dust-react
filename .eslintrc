@@ -1,0 +1,12 @@
+{
+	"env": {
+		"node": true
+	},
+	"ecmaFeatures": {
+		"jsx": true
+	},
+	"rules": {
+		"quotes": [2, "single"],
+		"eol-last": 0
+	}
+}
