@@ -7,9 +7,18 @@ var React = require('react'),
 var componentCache = {}, // memoization
 	atom = '\u269b';
 
-require('babel/register')({
-	extensions: ['.jsx']
-});
+// to deal with freshy nonsense
+if (global.$dustReactLoaded) {
+	if (!global.$dustReactWarning) {
+		console.warn('[dust-react] WARNING!!! Something is reloading this module repeatedly, probably freshy. *NOT* re-registering babel with jsx');
+		global.$dustReactWarning = true;
+	}
+} else {
+	require('babel-core/register')({
+		extensions: ['.jsx']
+	});
+	global.$dustReactLoaded = true;
+}
 
 function loadComponent(relativePath, componentPath, callback) {
 	var resolvedPath;
