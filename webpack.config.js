@@ -1,12 +1,12 @@
 module.exports = {
   entry: {
-    'dust-react':  './src/index.js'
+    'dust-helper-react':  './src/index.js'
   },
 
   output: {
     path: __dirname + '/dist',
     filename: '[name].js',
-    library: 'DustReact',
+    library: 'DustHelperReact',
     libraryTarget: 'umd'
   },
 

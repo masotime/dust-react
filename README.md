@@ -25,7 +25,7 @@ const dustHelperReact = require('dust-helper-react').default;
 
 *dust-helper-react* works in both Node.js and AMD environments. The require function is passed in when creating the helper.
 
-Adding the dust helper in either a Node.js environment:
+Adding the dust helper in a Node.js environment with ES6:
 
 ```js
 import dust from 'dustjs-linkedin';
@@ -37,7 +37,7 @@ dust.helpers.react = dustHelperReact(require);
 Using the helper in a template:
 
 ```html
-<div class="">
+<div id="module-mount">
   {@react component="react-module" props=. /}
 </div>
 ```
@@ -45,15 +45,15 @@ Using the helper in a template:
 Props can also be variadic, allowing you to pass in params to the helper that become React props.
 
 ```html
-<div class="">
-  {@react component="react-book" title='Boop' /}
+<div id="module-mount">
+  {@react component="react-book" title='Boop' pages=10 /}
 </div>
 ```
 
 This is equivalent to:
 
 ```js
-React.createElement(ReactBook, { title: 'boop' });
+React.createElement(ReactBook, { title: 'boop', pages: 10 });
 ```
 
 ## Tests
