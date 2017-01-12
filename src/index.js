@@ -9,14 +9,14 @@ import ReactDOM from 'react-dom/server';
  * @return {Promise}
  */
 function loadComponent (requireFn, component) {
-	return new Promise((resolve, reject) => {
-		try {
-			const module = requireFn(component);
-			resolve(module);
-		} catch (err) {
-			reject(err);
-		}
-	});
+  return new Promise((resolve, reject) => {
+    try {
+      const module = requireFn(component);
+      resolve(module);
+    } catch (err) {
+      reject(err);
+    }
+  });
 }
 
 /**
@@ -28,15 +28,15 @@ function loadComponent (requireFn, component) {
  * @return {Object}
  */
 function writeFailureMessage (message, chunk, params) {
-	console.error(message);
+  console.error(message);
 
-	const errorDiv = `
-		<div>${message} - params: ${JSON.stringify(params)}</div>
-	`;
+  const errorDiv = `
+    <div>${message} - params: ${JSON.stringify(params)}</div>
+  `;
 
-	return chunk.map((innerChunk) => {
-		return innerChunk.write(errorDiv).end();
-	});
+  return chunk.map((innerChunk) => {
+    return innerChunk.write(errorDiv).end();
+  });
 }
 
 /**
@@ -46,29 +46,29 @@ function writeFailureMessage (message, chunk, params) {
  * @return {Function} The dust-react helper.
  */
 export default function dustHelperReact (requireFn) {
-	return function (chunk, context, bodies, params) {
-		const { component } = params;
+  return function (chunk, context, bodies, params) {
+    const { component } = params;
 
-		if (typeof component !== 'string') {
-			return writeFailureMessage('dust-react: "component" is a required parameter and must be a string', chunk, params)
-		}
+    if (typeof component !== 'string') {
+      return writeFailureMessage('dust-react: "component" is a required parameter and must be a string', chunk, params)
+    }
 
-		let props;
+    let props;
 
-		if (params.props) {
-			props = params.props;
-		} else {
-			delete params.component;
-			props = params;
-		}
+    if (params.props) {
+      props = params.props;
+    } else {
+      delete params.component;
+      props = params;
+    }
 
-		const LoadedComponent = loadComponent(requireFn, component);
+    const LoadedComponent = loadComponent(requireFn, component);
 
-		return chunk.map((innerChunk) => {
-			return LoadedComponent.then((module) => {
-				const renderedComponent = ReactDOM.renderToString(React.createElement(module, props));
-				return innerChunk.write(renderedComponent).end();
-			});
-		});
-	}
+    return chunk.map((innerChunk) => {
+      return LoadedComponent.then((module) => {
+        const renderedComponent = ReactDOM.renderToString(React.createElement(module, props));
+        return innerChunk.write(renderedComponent).end();
+      });
+    });
+  }
 }

@@ -1,11 +1,11 @@
 <div id="test-case-no-props">
-	{@react component="test-component" /}
+  {@react component="test-component" /}
 </div>
 
 <div id="test-case-variadic-props">
-	{@react component="test-component" example="test-value" /}
+  {@react component="test-component" example="test-value" /}
 </div>
 
 <div id="test-case-explicit-props">
-	{@react component="test-component" props=explicitProps /}
+  {@react component="test-component" props=explicitProps /}
 </div>
