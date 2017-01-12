@@ -25,7 +25,7 @@ const dustHelperReact = require('dust-helper-react').default;
 
 *dust-helper-react* works in both Node.js and AMD environments. The require function is passed in when creating the helper.
 
-Adding the dust helper in either a Node.js or AMD environment:
+Adding the dust helper in either a Node.js environment:
 
 ```js
 import dust from 'dustjs-linkedin';
