@@ -1,60 +1,65 @@
-# dust-react
+# dust-helper-react
 
-_Note_: This component has been updated to use Babel instead of react-tools. Testing has also been added.
+A dust helper to render React components.
 
-Dust helper to render React components. Currently tailored to Kraken, although _theoretically_ it should work everywhere.
+**Features:**
 
-The helper is a function that takes 2 arguments, `dust` and an `options` object. Valid options are:
+- Server & client rendering (using requireJS on the client)
+- Gracefully fails on rendering errors
+- Allows passing React props as variadic or explicit params
 
-* `relativePath` - path to react components. The path is relative to `process.cwd()`
+## Module definition
 
-NOTE: The helper originally included bundalo that would load content automatically, but I decided against integrating it.
+This module provides the following methods for importing:
 
-## Kraken 1.x setup
+- Pre-compiled ES5 code for use in non-babel'd projects (`dust-helper-react/lib`)
+- UMD module for use in the browser (`dust-helper-react/dist`)
 
-To make it work, in `config.json` (or `development.json` etc.), add the following:
+The module is the default export. If you're using commonJS without babel transpiling import/exports, you'll need to explicitly reference the default export.
 
-    "view engines": {
-        "js": {
-            "module": "engine-munger",
-            "renderer": {
-                "method": "js",
-                "arguments": [
-                    {
-                        "cache": true,
-                        "helpers": [ {
-                            "name": "dust-react",
-                            "arguments": { "relativePath": "public/js/react" } }
-                        ]
-                    }, .....
-                ]
-            }
-        }
-    }
+```js
+const dustHelperReact = require('dust-helper-react').default;
+```
 
-Note the key lines under `view engines > js > renderer > arguments[0] > helpers`.
+## Usage
 
-## Use in dust files.
+*dust-helper-react* works in both Node.js and AMD environments. The require function is passed in when creating the helper.
 
-e.g.
+Adding the dust helper in either a Node.js or AMD environment:
 
-	{@react
-        component="textfield"
-        componentId="fruitControl"
-        props=reactProps
-	/}
+```js
+import dust from 'dustjs-linkedin';
+import dustHelperReact from 'dust-helper-react';
 
-A react component is declared via the parameters `component` and `componentId`.
+dust.helpers.react = dustHelperReact(require);
+```
 
-* `component` (**required**) must point to an actual `.jsx` file located in `relativePath` as defined under the setup.
-* `componentId` (**required**) is an id that is assigned to a `<div>` that wraps the rendered React component.
+Using the helper in a template:
 
-React props are passed in via the "props" attribute. If your props contain i18n content, you will need to make the correct locale-specific strings available as part of the props passed in via the model.
+```html
+<div class="">
+  {@react component="react-module" props=. /}
+</div>
+```
 
-## NOTES:
+Props can also be variadic, allowing you to pass in params to the helper that become React props.
 
-This is a server-side only helper. Thus, React components must follow the CommonJS standard. UMD defined components are recommended, see <https://github.com/umdjs/umd/blob/master/returnExports.js>
+```html
+<div class="">
+  {@react component="react-book" title='Boop' /}
+</div>
+```
 
-### TODO
+This is equivalent to:
 
-1. Find a magical way to synchronize rendering client-side as well
+```js
+React.createElement(ReactBook, { title: 'boop' });
+```
+
+## Tests
+
+The tests are written in Jest.
+
+```
+npm test
+```
