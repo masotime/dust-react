@@ -25,7 +25,7 @@ const dustHelperReact = require('dust-react').default;
 
 *dust-react* works in both Node.js and AMD environments. The require function is passed in when creating the helper.
 
-### Using the helper
+### Using The Helper
 
 
 ```js
@@ -66,6 +66,26 @@ This is equivalent to:
 
 ```js
 React.createElement(ReactBook, { title: 'boop', pages: 10 });
+```
+
+### Named Exports
+
+By default, *dust-react* will use the default export of the module. You can optionally specify a named export as well.
+
+```html
+<div id="module-mount">
+  {@react component="react-module" namedExport="example" props=. /}
+</div>
+```
+
+This is equivalent to:
+
+```js
+const component = require('react-module').example;
+
+// or in ES6
+
+import { example } from 'react-module';
 ```
 
 ## Tests

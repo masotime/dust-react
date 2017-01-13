@@ -25,7 +25,13 @@ describe('dust-helper-react', () => {
     });
 
     it('should render the component', () => {
-      return renderTestCases()
+      const template = `
+        <div id="test-case-no-props">
+          {@react component="test-component" /}
+        </div>
+      `;
+
+      return renderTestCase(template)
         .then(($) => {
           const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*"></div>`);
           const testCase = $('#test-case-no-props').html();
@@ -35,74 +41,123 @@ describe('dust-helper-react', () => {
   });
 
   describe('given we are in a commonJS context', () => {
-    beforeEach(() => {
-      const requireFn = jest.fn();
-      requireFn.mockReturnValue(TestComponent);
-      configureDust(dustHelperReact(requireFn, global));
-    });
+    describe('and the module is a named export', () => {
+      beforeEach(() => {
+        const requireFn = jest.fn();
+        requireFn.mockReturnValue({ test: TestComponent });
+        configureDust(dustHelperReact(requireFn, global));
+      });
 
-    describe('given no properties', () => {
       it('should render the component', () => {
-        return renderTestCases()
+        const template = `
+          <div id="test-case-named-export">
+            {@react component="test-component" namedExport="test" /}
+          </div>
+        `;
+
+        return renderTestCase(template)
           .then(($) => {
             const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*"></div>`);
-            const testCase = $('#test-case-no-props').html();
+            const testCase = $('#test-case-named-export');
             expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
           });
       });
     });
 
-    describe('given variadic properties as params', () => {
-      it('should render the component', () => {
-        return renderTestCases({
-          example: 'test-value'
-        }).then(($) => {
-          const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*">test-value</div>`);
-          const testCase = $('#test-case-variadic-props').html();
-          expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
+    describe('and the module is the default export', () => {
+      beforeEach(() => {
+        const requireFn = jest.fn();
+        requireFn.mockReturnValue(TestComponent);
+        configureDust(dustHelperReact(requireFn, global));
+      });
+
+      describe('given no properties', () => {
+        it('should render the component', () => {
+          const template = `
+            <div id="test-case-no-props">
+              {@react component="test-component" /}
+            </div>
+          `;
+
+          return renderTestCase(template)
+            .then(($) => {
+              const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*"></div>`);
+              const testCase = $('#test-case-no-props').html();
+              expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
+            });
         });
       });
-    });
 
-    describe('given properties passed as a single param', () => {
-      it('should render the component', () => {
-        return renderTestCases({
-          explicitProps: {
+      describe('given variadic properties as params', () => {
+        it('should render the component', () => {
+          const template = `
+            <div id="test-case-variadic-props">
+              {@react component="test-component" example="test-value" /}
+            </div>
+          `;
+
+          return renderTestCase(template, {
             example: 'test-value'
-          }
-        }).then(($) => {
-          const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*">test-value</div>`);
-          const testCase = $('#test-case-explicit-props').html();
-          expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
+          }).then(($) => {
+            const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*">test-value</div>`);
+            const testCase = $('#test-case-variadic-props').html();
+            expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
+          });
+        });
+      });
+
+      describe('given properties passed as a single param', () => {
+        it('should render the component', () => {
+          const template = `
+            <div id="test-case-explicit-props">
+              {@react component="test-component" props=explicitProps /}
+            </div>
+          `;
+
+          return renderTestCase(template, {
+            explicitProps: {
+              example: 'test-value'
+            }
+          }).then(($) => {
+            const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*">test-value</div>`);
+            const testCase = $('#test-case-explicit-props').html();
+            expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
+          });
         });
       });
     });
   });
 });
 
+/**
+ * Set up a dust helper.
+ * 
+ * @param {Function} helper
+ */
 function configureDust (helper) {
   dust.helpers = {
     react: helper
   };
 }
 
-function renderTestCases (context = {}) {
+/**
+ * Render a test case with dust.
+ * 
+ * @param {String} template
+ * @param {Object} context
+ * @returns {Promise}
+ */
+function renderTestCase (template, context = {}) {
   return new Promise((resolve, reject) => {
-    fs.readFile(path.resolve(__dirname, '../test/fixtures/test.dust'), 'utf8', (err, testFile) => {
+    const compiled = dust.compile(template, 'test');
+    dust.loadSource(compiled);
+
+    dust.render('test', context, (err, renderedTest) => {
       if (err) {
         return reject(err);
       }
 
-      const compiled = dust.compile(testFile, 'test');
-      dust.loadSource(compiled);
-
-      dust.render('test', context, (err, renderedTest) => {
-        if (err) {
-          return reject(err);
-        }
-
-        resolve(cheerio.load(renderedTest));
-      });
+      resolve(cheerio.load(renderedTest));
     });
   });
 }

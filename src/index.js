@@ -9,7 +9,7 @@ import ReactDOM from 'react-dom/server';
  * @param  {Object} globalContext The global context object (`global` in Node.js, `window` in the browser)
  * @return {Promise}
  */
-function loadComponent (requireFn, component, globalContext) {
+function loadModule (requireFn, component, globalContext) {
   return new Promise((resolve, reject) => {
     try {
       // AMD
@@ -57,27 +57,30 @@ function writeFailureMessage (message, chunk, params) {
  */
 export default function dustHelperReact (requireFn, globalContext = {}) {
   return function (chunk, context, bodies, params) {
-    const { component } = params;
+    const { component, namedExport } = params;
+
+    delete params.component;
+    delete params.namedExport;
 
     if (typeof component !== 'string') {
       return writeFailureMessage('dust-react: "component" is a required parameter and must be a string', chunk, params)
     }
 
-    let props;
-
-    if (params.props) {
-      props = params.props;
-    } else {
-      delete params.component;
-      props = params;
-    }
-
-    const LoadedComponent = loadComponent(requireFn, component, globalContext);
+    const props = params.props || params;
+    const loadedModulePromise = loadModule(requireFn, component, globalContext);
 
     return chunk.map((innerChunk) => {
-      return LoadedComponent
+      return loadedModulePromise
         .then((module) => {
-          const renderedComponent = ReactDOM.renderToString(React.createElement(module, props));
+          let ExportedComponent;
+
+          if (namedExport) {
+            ExportedComponent = module[namedExport];
+          } else {
+            ExportedComponent = module.default || module;
+          }
+
+          const renderedComponent = ReactDOM.renderToString(React.createElement(ExportedComponent, props));
           return innerChunk.write(renderedComponent).end();
         })
         .catch((err) => {
