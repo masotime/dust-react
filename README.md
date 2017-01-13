@@ -29,10 +29,10 @@ const dustHelperReact = require('dust-react').default;
 dustHelperReact(requireFn: function, globalContext: object)
 ```
 
-|Argument       |Type     |Description                                                                  |
-|-              |-        |-                                                                            |
-|requireFn      |Function |The require function based on the environment                                |
-|globalContext  |Object   |The global context object (`global` in Node.js and `window` in the browser)  |
+| Argument       | Type     | Description                                                                  |
+| -              | -        | -                                                                            |
+| requireFn      | Function | The require function based on the environment                                |
+| globalContext  | Object   | The global context object (`global` in Node.js and `window` in the browser)  |
 
 ### Example
 
