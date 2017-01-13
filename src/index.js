@@ -6,11 +6,20 @@ import ReactDOM from 'react-dom/server';
  *
  * @param  {Function} requireFn The require function based on the environment for your dust template.
  * @param  {String} component A path to require the component.
+ * @param  {Object} globalContext The global context object (`global` in Node.js, `window` in the browser)
  * @return {Promise}
  */
-function loadComponent (requireFn, component) {
+function loadComponent (requireFn, component, globalContext) {
   return new Promise((resolve, reject) => {
     try {
+      // AMD
+      if (typeof globalContext.define === 'function' && globalContext.define.amd) {
+        return requireFn([component], (module) => {
+          resolve(module);
+        });
+      }
+
+      // CommonJS
       const module = requireFn(component);
       resolve(module);
     } catch (err) {
@@ -43,9 +52,10 @@ function writeFailureMessage (message, chunk, params) {
  * Create a dust helper for rendering React components.
  *
  * @param  {Function} requireFn The require function based on the environment for your dust template.
+ * @param  {Object}   globalContext The global context object (`global` in Node.js, `window` in the browser)
  * @return {Function} The dust-react helper.
  */
-export default function dustHelperReact (requireFn) {
+export default function dustHelperReact (requireFn, globalContext = {}) {
   return function (chunk, context, bodies, params) {
     const { component } = params;
 
@@ -62,13 +72,17 @@ export default function dustHelperReact (requireFn) {
       props = params;
     }
 
-    const LoadedComponent = loadComponent(requireFn, component);
+    const LoadedComponent = loadComponent(requireFn, component, globalContext);
 
     return chunk.map((innerChunk) => {
-      return LoadedComponent.then((module) => {
-        const renderedComponent = ReactDOM.renderToString(React.createElement(module, props));
-        return innerChunk.write(renderedComponent).end();
-      });
+      return LoadedComponent
+        .then((module) => {
+          const renderedComponent = ReactDOM.renderToString(React.createElement(module, props));
+          return innerChunk.write(renderedComponent).end();
+        })
+        .catch((err) => {
+          return innerChunk.write(`dust-react: ${err.message}`).end();
+        });
     });
   }
 }

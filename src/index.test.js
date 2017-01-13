@@ -6,12 +6,24 @@ import fs from 'fs';
 import path from 'path';
 import cheerio from 'cheerio';
 
-const requireFn = jest.fn();
-requireFn.mockReturnValue(TestComponent);
-configureDust(dustHelperReact(requireFn));
-
 describe('dust-helper-react', () => {
-  describe('given no properties', () => {
+  afterEach(() => {
+    window.define = undefined;
+  });
+
+  describe('given we are in an AMD context', () => {
+    beforeEach(() => {
+      const rjsMock = (modules, callback) => {
+        callback(TestComponent);
+      };
+
+      // Set up AMD
+      window.define = jest.fn();
+      window.define.amd = {};
+
+      configureDust(dustHelperReact(rjsMock, window));
+    });
+
     it('should render the component', () => {
       return renderTestCases()
         .then(($) => {
@@ -22,28 +34,47 @@ describe('dust-helper-react', () => {
     });
   });
 
-  describe('given variadic properties as params', () => {
-    it('should render the component', () => {
-      return renderTestCases({
-        example: 'test-value'
-      }).then(($) => {
-        const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*">test-value</div>`);
-        const testCase = $('#test-case-variadic-props').html();
-        expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
+  describe('given we are in a commonJS context', () => {
+    beforeEach(() => {
+      const requireFn = jest.fn();
+      requireFn.mockReturnValue(TestComponent);
+      configureDust(dustHelperReact(requireFn, global));
+    });
+
+    describe('given no properties', () => {
+      it('should render the component', () => {
+        return renderTestCases()
+          .then(($) => {
+            const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*"></div>`);
+            const testCase = $('#test-case-no-props').html();
+            expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
+          });
       });
     });
-  });
 
-  describe('given properties passed as a single param', () => {
-    it('should render the component', () => {
-      return renderTestCases({
-        explicitProps: {
+    describe('given variadic properties as params', () => {
+      it('should render the component', () => {
+        return renderTestCases({
           example: 'test-value'
-        }
-      }).then(($) => {
-        const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*">test-value</div>`);
-        const testCase = $('#test-case-explicit-props').html();
-        expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
+        }).then(($) => {
+          const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*">test-value</div>`);
+          const testCase = $('#test-case-variadic-props').html();
+          expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
+        });
+      });
+    });
+
+    describe('given properties passed as a single param', () => {
+      it('should render the component', () => {
+        return renderTestCases({
+          explicitProps: {
+            example: 'test-value'
+          }
+        }).then(($) => {
+          const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*">test-value</div>`);
+          const testCase = $('#test-case-explicit-props').html();
+          expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
+        });
       });
     });
   });
