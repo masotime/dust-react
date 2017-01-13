@@ -1,7 +1,7 @@
 {
   "name": "dust-react",
   "version": "1.0.1",
-  "description": "Dust helper to render react components server-side",
+  "description": "Dust helper to render react components",
   "main": "lib/index.js",
   "scripts": {
     "test": "jest",
