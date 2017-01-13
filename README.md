@@ -5,8 +5,8 @@ A dust helper to render React components.
 **Features:**
 
 - Server & client rendering (using requireJS on the client)
-- Gracefully fails on rendering errors
 - Allows passing React props as variadic or explicit params
+- Gracefully fails on rendering errors
 
 ## Module Definition
 
@@ -43,6 +43,16 @@ import dustHelperReact from 'dust-react';
 dust.helpers = dust.helpers || {};
 dust.helpers.react = dustHelperReact(require, global);
 ```
+
+## Helper
+
+### Params
+
+| Param       | Type    | Description                                                   |
+| ---         | ---     | ---                                                           |
+| component   | String  |**Required** - the path to require the module                  |
+| props       | Object  | *optional* - Properties to be passed to `React.createElement` |
+| namedExport | String  | *optional* - Uses the default export if not specified         |
 
 The helper requires a reference to a **react component** as a string. This is what is used with the require function passed in when creating the helper.
 
