@@ -1,4 +1,4 @@
-# dust-helper-react
+# dust-react
 
 A dust helper to render React components.
 
@@ -12,35 +12,47 @@ A dust helper to render React components.
 
 This module provides the following methods for importing:
 
-- Pre-compiled ES5 code for use in non-babel'd projects (`dust-helper-react/lib`)
-- UMD module for use in the browser (`dust-helper-react/dist`)
+- Pre-compiled ES5 code for use in non-babel'd projects (`dust-react/lib`, which is also the main entry point when doing `require('dust-react')`)
+- UMD module for use in the browser (`dust-react/dist`)
 
-The module is the default export. If you're using commonJS without babel transpiling import/exports, you'll need to explicitly reference the default export.
+The module is the default export. If you're using CommonJS without babel transpiling import/exports, you'll need to explicitly reference the default export.
 
 ```js
-const dustHelperReact = require('dust-helper-react').default;
+const dustHelperReact = require('dust-react').default;
 ```
 
 ## Usage
 
-*dust-helper-react* works in both Node.js and AMD environments. The require function is passed in when creating the helper.
+*dust-react* works in both Node.js and AMD environments. The require function is passed in when creating the helper.
 
-Adding the dust helper in a Node.js environment with ES6:
+### Using the helper
+
 
 ```js
 import dust from 'dustjs-linkedin';
-import dustHelperReact from 'dust-helper-react';
+import dustHelperReact from 'dust-react';
 
+// Assuming the dust.helpers object already exists
 dust.helpers.react = dustHelperReact(require);
 ```
 
-Using the helper in a template:
+The helper requires a reference to a **react component** as a string. This is what is used with the require function passed in when creating the helper.
 
 ```html
 <div id="module-mount">
   {@react component="react-module" props=. /}
 </div>
 ```
+
+This equates to a require statement that looks like the following:
+
+```js
+require('react-module');
+```
+
+(*Note about AMD* - all modules are loaded asynchronously, and the rjs optimizer is not yet supported)
+
+### Props
 
 Props can also be variadic, allowing you to pass in params to the helper that become React props.
 

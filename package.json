@@ -1,6 +1,6 @@
 {
-  "name": "dust-helper-react",
-  "version": "0.0.0",
+  "name": "dust-react",
+  "version": "1.0.1",
   "description": "Dust helper to render react components server-side",
   "main": "lib/index.js",
   "scripts": {
@@ -12,14 +12,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:aarongodin/dust-helper-react.git"
+    "url": "git@github.com:masotime/dust-react.git"
   },
   "keywords": [
     "dust",
     "react"
   ],
-  "author": "Aaron Godin <godinaaweb@gmail.com>",
-  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/masotime/dust-react/issues"
+  },
+  "homepage": "https://github.com/masotime/dust-react",
+  "author": "Benjamin Goh <masotime@gmail.com>",
+  "license": "ISC",
   "dependencies": {
     "react": "15.4.2",
     "react-dom": "15.4.2"
