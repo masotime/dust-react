@@ -2,8 +2,6 @@ import dustHelperReact from './index';
 import expect from 'jest-matchers';
 import { TestComponent } from '../test/fixtures/test-component';
 import dust from 'dustjs-linkedin';
-import fs from 'fs';
-import path from 'path';
 import cheerio from 'cheerio';
 
 describe('dust-helper-react', () => {
