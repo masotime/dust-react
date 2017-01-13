@@ -8,7 +8,7 @@ A dust helper to render React components.
 - Gracefully fails on rendering errors
 - Allows passing React props as variadic or explicit params
 
-## Module definition
+## Module Definition
 
 This module provides the following methods for importing:
 
