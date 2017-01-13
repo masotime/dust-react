@@ -23,17 +23,25 @@ const dustHelperReact = require('dust-react').default;
 
 ## Usage
 
-*dust-react* works in both Node.js and AMD environments. The require function is passed in when creating the helper.
+*dust-react* works in both Node.js and AMD environments. The helper needs a reference to the `require` function as well as the global context.
 
-### Using The Helper
+```js
+dustHelperReact(requireFn: function, globalContext: object)
+```
 
+|Argument       |Type     |Description                                                                  |
+|-              |-        |-                                                                            |
+|requireFn      |Function |The require function based on the environment                                |
+|globalContext  |Object   |The global context object (`global` in Node.js and `window` in the browser)  |
+
+### Example
 
 ```js
 import dust from 'dustjs-linkedin';
 import dustHelperReact from 'dust-react';
 
-// Assuming the dust.helpers object already exists
-dust.helpers.react = dustHelperReact(require);
+dust.helpers = dust.helpers || {};
+dust.helpers.react = dustHelperReact(require, global);
 ```
 
 The helper requires a reference to a **react component** as a string. This is what is used with the require function passed in when creating the helper.
