@@ -31,7 +31,7 @@ describe('dust-helper-react', () => {
 
       return renderTestCase(template)
         .then(($) => {
-          const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*"></div>`);
+          const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot="[^"]*" data-reactid="[^"]*" data-react-checksum="[^"]*"></div>`);
           const testCase = $('#test-case-no-props').html();
           expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
         });
@@ -55,7 +55,7 @@ describe('dust-helper-react', () => {
 
         return renderTestCase(template)
           .then(($) => {
-            const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*"></div>`);
+            const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot="[^"]*" data-reactid="[^"]*" data-react-checksum="[^"]*"></div>`);
             const testCase = $('#test-case-named-export');
             expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
           });
@@ -79,7 +79,7 @@ describe('dust-helper-react', () => {
 
           return renderTestCase(template)
             .then(($) => {
-              const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*"></div>`);
+              const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot="[^"]*" data-reactid="[^"]*" data-react-checksum="[^"]*"></div>`);
               const testCase = $('#test-case-no-props').html();
               expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
             });
@@ -97,7 +97,7 @@ describe('dust-helper-react', () => {
           return renderTestCase(template, {
             example: 'test-value'
           }).then(($) => {
-            const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*">test-value</div>`);
+            const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot="[^"]*" data-reactid="[^"]*" data-react-checksum="[^"]*">test-value</div>`);
             const testCase = $('#test-case-variadic-props').html();
             expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
           });
@@ -117,7 +117,7 @@ describe('dust-helper-react', () => {
               example: 'test-value'
             }
           }).then(($) => {
-            const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot=".*" data-reactid=".*" data-react-checksum=".*">test-value</div>`);
+            const expectedHtmlRegex = new RegExp(`<div class="test-case" data-reactroot="[^"]*" data-reactid="[^"]*" data-react-checksum="[^"]*">test-value</div>`);
             const testCase = $('#test-case-explicit-props').html();
             expect(testCase).toEqual(expect.stringMatching(expectedHtmlRegex));
           });
