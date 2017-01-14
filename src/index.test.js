@@ -19,7 +19,10 @@ describe('dust-helper-react', () => {
       window.define = jest.fn();
       window.define.amd = {};
 
-      configureDust(dustHelperReact(rjsMock, window));
+      configureDust(dustHelperReact({
+        requireFn: rjsMock,
+        globalContext: window
+      }));
     });
 
     it('should render the component', () => {
@@ -43,7 +46,11 @@ describe('dust-helper-react', () => {
       beforeEach(() => {
         const requireFn = jest.fn();
         requireFn.mockReturnValue({ test: TestComponent });
-        configureDust(dustHelperReact(requireFn, global));
+        configureDust(dustHelperReact({
+          requireFn,
+          globalContext: global,
+          componentDir: '/'
+        }));
       });
 
       it('should render the component', () => {
@@ -66,7 +73,11 @@ describe('dust-helper-react', () => {
       beforeEach(() => {
         const requireFn = jest.fn();
         requireFn.mockReturnValue(TestComponent);
-        configureDust(dustHelperReact(requireFn, global));
+        configureDust(dustHelperReact({
+          requireFn,
+          globalContext: global,
+          componentDir: '/'
+        }));
       });
 
       describe('given no properties', () => {

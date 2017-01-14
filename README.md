@@ -10,7 +10,7 @@ A dust helper to render React components.
 
 ## Module Definition
 
-This module provides the following methods for importing:
+*dust-react* provides the following ways of importing:
 
 - Pre-compiled ES5 code for use in non-babel'd projects (`dust-react/lib`, which is also the main entry point when doing `require('dust-react')`)
 - UMD module for use in the browser (`dust-react/dist`)
@@ -23,25 +23,31 @@ const dustHelperReact = require('dust-react').default;
 
 ## Usage
 
-*dust-react* works in both Node.js and AMD environments. The helper needs a reference to the `require` function as well as the global context.
+*dust-react* works in both Node.js and AMD environments. Configuring the helper based on the environment allows loading modules in both contexts.
 
 ```js
-dustHelperReact(requireFn: function, globalContext: object)
+dustHelperReact(options: object)
 ```
 
-| Argument       | Type     | Description                                                                  |
-| ---            | ---      | ---                                                                          |
-| requireFn      | Function | The require function based on the environment                                |
-| globalContext  | Object   | The global context object (`global` in Node.js and `window` in the browser)  |
+| Option         | Type     | Description                                                                                 |
+| ---            | ---      | ---                                                                                         |
+| requireFn      | Function | **Required** - The require function based on the environment                                |
+| globalContext  | Object   | **Required** - The global context object (`global` in Node.js and `window` in the browser)  |
+| componentDir   | String   | *Optional* - An absolute path for requiring components in Node.js                           |
 
 ### Example
 
 ```js
 import dust from 'dustjs-linkedin';
 import dustHelperReact from 'dust-react';
+import path from 'path';
 
 dust.helpers = dust.helpers || {};
-dust.helpers.react = dustHelperReact(require, global);
+dust.helpers.react = dustHelperReact({
+  requireFn: require,
+  globalContext: global,
+  componentDir: path.resolve(__dirname, '../component')
+});
 ```
 
 ## Helper
@@ -105,6 +111,19 @@ const component = require('react-module').example;
 
 import { example } from 'react-module';
 ```
+
+## Component Paths
+
+Component paths can be either a relative path or a package path.
+
+* **Relative path**: `./local-component/example` (must start with a dot-slash)
+* **Package path**: `some-npm-module`
+
+### Relative Paths -- Node.js vs AMD
+
+While the API for requiring components is the same between Node and AMD, you'll need to make sure that RequireJS is configured with a `baseUrl`.
+
+Under the hood, every path to a component for AMD becomes a package path. Passing in a relative path will result in requiring the module without the `./`. This allows you to reference a local file for rendering server-side and reference the same file from your RequireJS `baseUrl`.
 
 ## Tests
 
