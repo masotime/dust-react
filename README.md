@@ -121,8 +121,6 @@ Component paths can be either a relative path or a package path.
 
 ### Relative Paths -- Node.js vs AMD
 
-While the API for requiring components is the same between Node and AMD, you'll need to make sure that RequireJS is configured with a `baseUrl`.
-
 Under the hood, every path to a component for AMD becomes a package path. Passing in a relative path will result in requiring the module without the `./`. This allows you to reference a local file for rendering server-side and reference the same file from your RequireJS `baseUrl`.
 
 ## Tests
