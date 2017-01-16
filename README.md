@@ -1,60 +1,132 @@
 # dust-react
 
-_Note_: This component has been updated to use Babel instead of react-tools. Testing has also been added.
+A dust helper to render React components.
 
-Dust helper to render React components. Currently tailored to Kraken, although _theoretically_ it should work everywhere.
+**Features:**
 
-The helper is a function that takes 2 arguments, `dust` and an `options` object. Valid options are:
+- Server & client rendering (using requireJS on the client)
+- Allows passing React props as variadic or explicit params
+- Gracefully fails on rendering errors
 
-* `relativePath` - path to react components. The path is relative to `process.cwd()`
+## Module Definition
 
-NOTE: The helper originally included bundalo that would load content automatically, but I decided against integrating it.
+*dust-react* provides the following ways of importing:
 
-## Kraken 1.x setup
+- Pre-compiled ES5 code for use in non-babel'd projects (`dust-react/lib`, which is also the main entry point when doing `require('dust-react')`)
+- UMD module for use in the browser (`dust-react/dist`)
 
-To make it work, in `config.json` (or `development.json` etc.), add the following:
+The module is the default export. If you're using CommonJS without babel transpiling import/exports, you'll need to explicitly reference the default export.
 
-    "view engines": {
-        "js": {
-            "module": "engine-munger",
-            "renderer": {
-                "method": "js",
-                "arguments": [
-                    {
-                        "cache": true,
-                        "helpers": [ {
-                            "name": "dust-react",
-                            "arguments": { "relativePath": "public/js/react" } }
-                        ]
-                    }, .....
-                ]
-            }
-        }
-    }
+```js
+const dustHelperReact = require('dust-react').default;
+```
 
-Note the key lines under `view engines > js > renderer > arguments[0] > helpers`.
+## Usage
 
-## Use in dust files.
+*dust-react* works in both Node.js and AMD environments. Configuring the helper based on the environment allows loading modules in both contexts.
 
-e.g.
+```js
+dustHelperReact(options: object)
+```
 
-	{@react
-        component="textfield"
-        componentId="fruitControl"
-        props=reactProps
-	/}
+| Option         | Type     | Description                                                                                 |
+| ---            | ---      | ---                                                                                         |
+| requireFn      | Function | **Required** - The require function based on the environment                                |
+| globalContext  | Object   | **Required** - The global context object (`global` in Node.js and `window` in the browser)  |
+| componentDir   | String   | *Optional* - An absolute path for requiring components in Node.js                           |
 
-A react component is declared via the parameters `component` and `componentId`.
+### Example
 
-* `component` (**required**) must point to an actual `.jsx` file located in `relativePath` as defined under the setup.
-* `componentId` (**required**) is an id that is assigned to a `<div>` that wraps the rendered React component.
+```js
+import dust from 'dustjs-linkedin';
+import dustHelperReact from 'dust-react';
+import path from 'path';
 
-React props are passed in via the "props" attribute. If your props contain i18n content, you will need to make the correct locale-specific strings available as part of the props passed in via the model.
+dust.helpers = dust.helpers || {};
+dust.helpers.react = dustHelperReact({
+  requireFn: require,
+  globalContext: global,
+  componentDir: path.resolve(__dirname, '../component')
+});
+```
 
-## NOTES:
+## Helper
 
-This is a server-side only helper. Thus, React components must follow the CommonJS standard. UMD defined components are recommended, see <https://github.com/umdjs/umd/blob/master/returnExports.js>
+### Params
 
-### TODO
+| Param       | Type    | Description                                                   |
+| ---         | ---     | ---                                                           |
+| component   | String  |**Required** - the path to require the module                  |
+| props       | Object  | *optional* - Properties to be passed to `React.createElement` |
+| namedExport | String  | *optional* - Uses the default export if not specified         |
 
-1. Find a magical way to synchronize rendering client-side as well
+The helper requires a reference to a **react component** as a string. This is what is used with the require function passed in when creating the helper.
+
+```html
+<div id="module-mount">
+  {@react component="react-module" props=. /}
+</div>
+```
+
+This equates to a require statement that looks like the following:
+
+```js
+require('react-module');
+```
+
+(*Note about AMD* - all modules are loaded asynchronously, and the rjs optimizer is not yet supported)
+
+### Props
+
+Props can also be variadic, allowing you to pass in params to the helper that become React props.
+
+```html
+<div id="module-mount">
+  {@react component="react-book" title='Boop' pages=10 /}
+</div>
+```
+
+This is equivalent to:
+
+```js
+React.createElement(ReactBook, { title: 'boop', pages: 10 });
+```
+
+### Named Exports
+
+By default, *dust-react* will use the default export of the module. You can optionally specify a named export as well.
+
+```html
+<div id="module-mount">
+  {@react component="react-module" namedExport="example" props=. /}
+</div>
+```
+
+This is equivalent to:
+
+```js
+const component = require('react-module').example;
+
+// or in ES6
+
+import { example } from 'react-module';
+```
+
+## Component Paths
+
+Component paths can be either a relative path or a package path.
+
+* **Relative path**: `./local-component/example` (must start with a dot-slash)
+* **Package path**: `some-npm-module`
+
+### Relative Paths -- Node.js vs AMD
+
+Under the hood, every path to a component for AMD becomes a package path. Passing in a relative path will result in requiring the module without the `./`. This allows you to reference a local file for rendering server-side and reference the same file from your RequireJS `baseUrl`.
+
+## Tests
+
+The tests are written in Jest.
+
+```
+npm test
+```

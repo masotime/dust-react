@@ -1,5 +1,0 @@
-<html>
-	<body>
-		{@react component="textfield.jsx" componentId="name" props=nameProps /}
-	</body>
-</html>
