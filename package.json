@@ -1,6 +1,6 @@
 {
   "name": "dust-react",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Dust helper to render react components",
   "main": "lib/index.js",
   "scripts": {
